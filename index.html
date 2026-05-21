@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda da Laudi</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FDF8F3;
+    --card: #FFFFFF;
+    --accent: #C17B4E;
+    --accent-light: #F5E6D8;
+    --accent-dark: #8A5230;
+    --text: #2C1F14;
+    --text-muted: #8A7060;
+    --border: #E8DACE;
+    --green: #4A7C59;
+    --green-light: #E8F3EC;
+    --blue: #4A6FA5;
+    --blue-light: #E8EEF8;
+    --red: #A5524A;
+    --red-light: #F8E8E8;
+    --shadow: 0 2px 16px rgba(44,31,20,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  #setup-screen .logo {
+    font-family: 'Lora', serif;
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  #setup-screen .subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    font-style: italic;
+    font-family: 'Lora', serif;
+  }
+
+  .setup-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: var(--shadow);
+  }
+
+  .setup-card h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .setup-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .setup-card input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .setup-card input:focus { border-color: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--accent-dark); }
+
+  .setup-hint {
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .setup-hint a { color: var(--accent); text-decoration: none; }
+
+  /* MAIN APP */
+  #app { display: none; max-width: 480px; margin: 0 auto; padding: 0 1rem; }
+
+  .app-header {
+    padding: 2rem 0 1.5rem;
+    text-align: center;
+  }
+
+  .app-header .logo {
+    font-family: 'Lora', serif;
+    font-size: 1.8rem;
+    color: var(--accent);
+  }
+
+  .app-header .date-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'Lora', serif;
+    font-style: italic;
+  }
+
+  /* CHAT */
+  .chat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+  }
+
+  .chat-header {
+    background: var(--accent);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-header .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .chat-header .info { flex: 1; }
+  .chat-header .info .name { font-size: 0.9rem; font-weight: 500; color: white; }
+  .chat-header .info .status { font-size: 0.72rem; color: rgba(255,255,255,0.7); }
+
+  .chat-messages {
+    padding: 1rem;
+    min-height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .bubble.bot {
+    align-self: flex-start;
+    background: var(--accent-light);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .bubble.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .typing-bubble {
+    align-self: flex-start;
+    background: var(--accent-light);
+    padding: 12px 16px;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.15s; }
+  .dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+  .suggestions {
+    padding: 0 1rem 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sug-chip {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .sug-chip:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-input-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 24px;
+    font-size: 0.88rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  .chat-input-row input:focus { border-color: var(--accent); }
+
+  .send-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .send-btn:hover { background: var(--accent-dark); }
+
+  /* EVENTS */
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title .count {
+    background: var(--accent);
+    color: white;
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .event-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .event-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .event-icon.medico { background: var(--blue-light); }
+  .event-icon.remedio { background: var(--green-light); }
+  .event-icon.outro { background: var(--accent-light); }
+
+  .event-body { flex: 1; min-width: 0; }
+  .event-title { font-weight: 500; font-size: 0.9rem; color: var(--text); margin-bottom: 3px; }
+  .event-when { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 5px; display: flex; align-items: center; gap: 4px; }
+
+  .event-reminder {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--green-light);
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .event-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .event-del:hover { background: var(--red-light); color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  /* WHATSAPP SECTION */
+  .whatsapp-card {
+    background: #E8F5E9;
+    border: 1px solid #C8E6C9;
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .whatsapp-card .wa-icon { font-size: 1.8rem; }
+  .whatsapp-card .wa-text { flex: 1; }
+  .whatsapp-card .wa-text strong { font-size: 0.88rem; color: #2E7D32; display: block; margin-bottom: 2px; }
+  .whatsapp-card .wa-text span { font-size: 0.78rem; color: #4CAF50; }
+  .wa-btn {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .wa-btn:hover { background: #128C7E; }
+
+  /* CONFIG KEY */
+  .change-key {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .change-key button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="logo">🌸 Agenda da Laudi</div>
+  <div class="subtitle">Um cuidado com carinho</div>
+
+  <div class="setup-card">
+    <h2>Primeira configuração</h2>
+    <p>Para a inteligência artificial funcionar, insira sua chave de API do Google Gemini. É gratuita e fica salva só no seu aparelho.</p>
+    <input type="password" id="api-key-input" placeholder="AIza..." />
+    <button class="btn-primary" onclick="saveKey()">Entrar na agenda ›</button>
+    <div class="setup-hint">
+      Não tem chave ainda?
+      <a href="https://aistudio.google.com/app/apikey" target="_blank">Criar grátis em aistudio.google.com</a>
+      <br>100% gratuito, sem cartão de crédito.
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="app-header">
+    <div class="logo">🌸 Agenda da Laudi</div>
+    <div class="date-label" id="date-label"></div>
+  </div>
+
+  <!-- WHATSAPP TIP -->
+  <div class="whatsapp-card">
+    <div class="wa-icon">💬</div>
+    <div class="wa-text">
+      <strong>Dica: ativar lembretes no WhatsApp</strong>
+      <span>Configure CallMeBot para receber alertas automáticos</span>
+    </div>
+    <button class="wa-btn" onclick="window.open('https://www.callmebot.com/blog/free-api-whatsapp-messages/', '_blank')">Ver guia</button>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="avatar">🤖</div>
+      <div class="info">
+        <div class="name">Assistente da Agenda</div>
+        <div class="status">online</div>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="bubble bot">
+        Olá! 🌸 Me conta o compromisso da Laudi. Pode escrever do jeito que preferir, por exemplo: <em>"consulta com cardiologista na sexta às 14h"</em> ou <em>"tomar remédio todo dia às 8 da manhã"</em>.
+      </div>
+    </div>
+
+    <div class="suggestions">
+      <span class="sug-chip" onclick="fillInput('consulta médica na sexta às 14h')">consulta médica</span>
+      <span class="sug-chip" onclick="fillInput('tomar remédio todo dia às 8h')">remédio diário</span>
+      <span class="sug-chip" onclick="fillInput('exame de sangue amanhã às 7h30')">exame</span>
+      <span class="sug-chip" onclick="fillInput('fisioterapia toda terça e quinta às 10h')">fisioterapia</span>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="user-input" placeholder="Digite o compromisso..." onkeydown="if(event.key==='Enter') sendMessage()" />
+      <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- EVENTS LIST -->
+  <div class="section-title">
+    <span>📋 Compromissos</span>
+    <span class="count" id="event-count">0</span>
+  </div>
+  <div id="events-list">
+    <div class="empty-state">Nenhum compromisso ainda.<br>Adicione o primeiro acima ↑</div>
+  </div>
+
+  <div class="change-key">
+    <button onclick="changeKey()">Trocar chave de API</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'agenda_mae_key';
+const EVENTS_KEY = 'agenda_mae_events';
+
+let apiKey = '';
+let events = [];
+
+function init() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    apiKey = saved;
+    showApp();
+  }
+  const savedEvents = localStorage.getItem(EVENTS_KEY);
+  if (savedEvents) {
+    try { events = JSON.parse(savedEvents); } catch(e) { events = []; }
+  }
+  const now = new Date();
+  const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  document.getElementById('date-label').textContent = now.toLocaleDateString('pt-BR', opts);
+}
+
+function saveKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('AIza')) {
+    alert('Chave inválida. Deve começar com AIza...');
+    return;
+  }
+  localStorage.setItem(STORAGE_KEY, key);
+  apiKey = key;
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  renderEvents();
+}
+
+function changeKey() {
+  localStorage.removeItem(STORAGE_KEY);
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function fillInput(txt) {
+  document.getElementById('user-input').value = txt;
+  document.getElementById('user-input').focus();
+}
+
+function addBubble(role, html) {
+  const chat = document.getElementById('chat-messages');
+  const b = document.createElement('div');
+  b.className = 'bubble ' + role;
+  b.innerHTML = html;
+  chat.appendChild(b);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat-messages');
+  const t = document.createElement('div');
+  t.className = 'typing-bubble';
+  t.id = 'typing';
+  t.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  chat.appendChild(t);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function saveEvents() {
+  localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+}
+
+function renderEvents() {
+  const el = document.getElementById('events-list');
+  document.getElementById('event-count').textContent = events.length;
+
+  if (events.length === 0) {
+    el.innerHTML = '<div class="empty-state">Nenhum compromisso ainda.<br>Adicione o primeiro acima ↑</div>';
+    return;
+  }
+
+  el.innerHTML = '';
+  events.forEach((ev, i) => {
+    const icons = { medico: '🩺', remedio: '💊', outro: '📅' };
+    const icon = icons[ev.tipo] || '📅';
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    card.innerHTML = `
+      <div class="event-icon ${ev.tipo}">${icon}</div>
+      <div class="event-body">
+        <div class="event-title">${ev.titulo}</div>
+        <div class="event-when">🕐 ${ev.quando}</div>
+        <span class="event-reminder">🔔 Lembrete: ${ev.lembrete}</span>
+      </div>
+      <button class="event-del" onclick="removeEvent(${i})" title="Remover">✕</button>
+    `;
+    el.appendChild(card);
+  });
+}
+
+function removeEvent(i) {
+  if (confirm('Remover este compromisso?')) {
+    events.splice(i, 1);
+    saveEvents();
+    renderEvents();
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  addBubble('user', text);
+  showTyping();
+
+  const existingList = events.length > 0
+    ? 'Compromissos já cadastrados: ' + events.map(e => e.titulo + ' (' + e.quando + ')').join('; ')
+    : 'Nenhum compromisso cadastrado ainda.';
+
+  const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  const systemPrompt = `Você é uma assistente de agenda gentil para uma senhora idosa brasileira. Hoje é ${today}.
+${existingList}
+
+Responda APENAS com JSON válido, sem markdown, sem explicação extra:
+{
+  "resposta": "mensagem carinhosa confirmando (máximo 2 frases)",
+  "evento": {
+    "titulo": "título curto e claro",
+    "quando": "data e horário formatados em português ex: Sexta-feira, 20/05 às 14h00",
+    "lembrete": "sugestão de quando lembrar ex: 1 hora antes, na véspera às 20h, todo dia às 8h",
+    "tipo": "medico ou remedio ou outro",
+    "recorrente": true ou false
+  }
+}
+
+Se não for compromisso, retorne:
+{"resposta": "mensagem simpática explicando que não entendeu como compromisso", "evento": null}`;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: text }] }],
+        generationConfig: { maxOutputTokens: 800, temperature: 0.3 }
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) {
+      addBubble('bot', '⚠️ Erro na chave de API: ' + data.error.message);
+      return;
+    }
+
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    addBubble('bot', parsed.resposta);
+
+    if (parsed.evento) {
+      events.unshift(parsed.evento);
+      saveEvents();
+      renderEvents();
+    }
+
+  } catch(e) {
+    removeTyping();
+    addBubble('bot', '⚠️ Não consegui processar. Verifique sua conexão e tente novamente.');
+    console.error(e);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
