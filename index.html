@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda da Laudi</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rosa:#e8927c; --rosa-claro:#fdf0ed;
+  --verde:#5aab8f; --verde-claro:#eaf6f1;
+  --azul:#6b9abf; --azul-claro:#eaf2f8;
+  --lilas:#9b8ec4; --lilas-claro:#f0eef9;
+  --amber:#d4956a; --amber-claro:#fdf3ec;
+  --vermelho:#e05c4a; --vermelho-claro:#fdecea;
+  --cinza:#8e9aaa; --texto:#2e3a48; --texto-leve:#6b7a8d;
+  --fundo:#f7f4f1; --branco:#ffffff;
+  --sombra-sm:0 2px 8px rgba(0,0,0,0.07);
+  --sombra:0 4px 16px rgba(0,0,0,0.10);
+  --radius:20px; --fsize:1rem;
+}
+.fonte-maior { --fsize:1.18rem; }
+.lousa-tema {
+  --fundo:#1e2d1a; --branco:#243320; --texto:#e8f5e0;
+  --texto-leve:#a8c8a0; --cinza:#7a9870; --verde:#6dc98a;
+  --sombra:0 4px 16px rgba(0,0,0,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#e8e0d8,#d4ccc4);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:24px 16px;}
+.phone{width:390px;height:844px;background:var(--fundo);border-radius:50px;box-shadow:0 40px 100px rgba(0,0,0,0.28),0 0 0 2px #b8bec4,inset 0 0 0 1px rgba(255,255,255,0.5);overflow:hidden;display:flex;flex-direction:column;position:relative;transition:background 0.4s;}
+.notch{background:#111;height:34px;border-radius:50px 50px 0 0;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notch::after{content:'';width:90px;height:18px;background:#000;border-radius:20px;}
+.statusbar{background:rgba(255,255,255,0.6);backdrop-filter:blur(8px);padding:5px 20px;display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--texto);flex-shrink:0;}
+.app-header{background:linear-gradient(135deg,#5aab8f,#4a9a7f);padding:12px 18px 14px;color:white;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 12px rgba(90,171,143,0.3);}
+.header-left h1{font-size:calc(var(--fsize)*1.15);font-weight:900;}
+.header-left .data{font-size:calc(var(--fsize)*0.72);opacity:.85;margin-top:1px;}
+.sos-btn{background:#e05c4a;color:white;border:none;border-radius:50%;width:46px;height:46px;font-size:10px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 3px 12px rgba(224,92,74,0.5);animation:pulso 2.5s infinite;line-height:1.1;}
+@keyframes pulso{0%,100%{box-shadow:0 3px 12px rgba(224,92,74,0.5);}50%{box-shadow:0 3px 20px rgba(224,92,74,0.7),0 0 0 7px rgba(224,92,74,0.15);}}
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.screen.ativo{display:flex;}
+.scroll-area{flex:1;overflow-y:auto;padding:12px 14px 20px;-webkit-overflow-scrolling:touch;}
+.scroll-area::-webkit-scrollbar{width:3px;}
+.scroll-area::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px;}
+.banner{margin:10px 14px 2px;background:linear-gradient(135deg,#d4956a,#c4855a);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(212,149,106,0.35);flex-shrink:0;}
+.banner-info{flex:1;}
+.banner-tag{font-size:10px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:1px;}
+.banner-nome{font-size:calc(var(--fsize)*1.05);font-weight:900;color:white;margin-top:1px;}
+.banner-hora{font-size:calc(var(--fsize)*0.8);color:rgba(255,255,255,0.85);margin-top:1px;}
+.btn-ok{background:white;color:#c4855a;border:none;border-radius:12px;padding:9px 14px;font-size:calc(var(--fsize)*0.85);font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
+.filtro{display:flex;gap:6px;padding:8px 14px 4px;flex-shrink:0;}
+.filtro-btn{flex:1;padding:8px 4px;border:none;border-radius:12px;font-size:calc(var(--fsize)*0.82);font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;}
+.filtro-btn.ativo{background:var(--verde);color:white;}
+.filtro-btn:not(.ativo){background:rgba(0,0,0,0.07);color:var(--texto-leve);}
+.sec-title{font-size:calc(var(--fsize)*0.72);font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--cinza);margin:14px 2px 8px;}
+
+/* STATUS BADGE */
+.status-badge{display:inline-flex;align-items:center;gap:3px;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;white-space:nowrap;}
+.status-pendente{background:#f0f2f5;color:var(--cinza);}
+.status-agora{background:#fff3cd;color:#b8860b;animation:piscaAgora 1.5s infinite;}
+.status-atrasado{background:var(--vermelho-claro);color:var(--vermelho);animation:piscaAlerta 1s infinite;}
+.status-feito{background:var(--verde-claro);color:var(--verde);}
+.status-adiado{background:var(--lilas-claro);color:var(--lilas);}
+@keyframes piscaAgora{0%,100%{opacity:1;}50%{opacity:.6;}}
+@keyframes piscaAlerta{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+.card{background:var(--branco);border-radius:var(--radius);padding:13px 13px 13px 14px;margin-bottom:10px;box-shadow:var(--sombra-sm);display:flex;gap:10px;align-items:flex-start;transition:opacity 0.3s,transform 0.2s;position:relative;overflow:hidden;cursor:pointer;}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:4px 0 0 4px;}
+.card.remedios::before{background:var(--lilas);}
+.card.consulta::before{background:var(--azul);}
+.card.atividade::before{background:var(--verde);}
+.card.refeicao::before{background:var(--amber);}
+.card.familia::before{background:var(--rosa);}
+.card.atrasado-card{border:1.5px solid var(--vermelho);box-shadow:0 0 0 2px rgba(224,92,74,0.15);}
+.card.feito{opacity:.5;transform:scale(0.98);}
+.card.feito .card-titulo{text-decoration:line-through;color:var(--cinza);}
+.card-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;}
+.card.remedios .card-icon{background:var(--lilas-claro);}
+.card.consulta .card-icon{background:var(--azul-claro);}
+.card.atividade .card-icon{background:var(--verde-claro);}
+.card.refeicao .card-icon{background:var(--amber-claro);}
+.card.familia .card-icon{background:var(--rosa-claro);}
+.card-body{flex:1;min-width:0;}
+.card-titulo{font-size:calc(var(--fsize)*0.95);font-weight:800;color:var(--texto);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.card-hora{font-size:calc(var(--fsize)*0.78);color:var(--cinza);font-weight:700;}
+.chip{border-radius:8px;padding:2px 7px;font-size:10px;font-weight:800;white-space:nowrap;}
+.chip.recorrente{background:var(--verde-claro);color:var(--verde);}
+.chip.aviso-dia{background:var(--azul-claro);color:var(--azul);}
+.chip.aviso-ant{background:var(--lilas-claro);color:var(--lilas);}
+.chip.urgente{background:var(--vermelho-claro);color:var(--vermelho);}
+.pessoa-badge{width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;color:white;flex-shrink:0;}
+.pb-l{background:#e8927c;} .pb-ci{background:#6b9abf;} .pb-cl{background:#5aab8f;} .pb-q{background:#9b8ec4;}
+.btn-acao{background:rgba(0,0,0,0.05);border:none;border-radius:12px;padding:8px 10px;font-size:calc(var(--fsize)*0.78);cursor:pointer;font-weight:800;font-family:'Nunito',sans-serif;color:var(--texto-leve);white-space:nowrap;transition:all 0.2s;align-self:center;}
+.btn-acao.feito-btn{background:var(--verde-claro);color:var(--verde);}
+.btn-acao.adiar-btn{background:var(--lilas-claro);color:var(--lilas);}
+
+/* LOUSA */
+.lousa-board{background:#243d20;border-radius:18px;padding:14px;margin-bottom:12px;}
+.lousa-col-title{font-family:'Caveat',cursive;color:rgba(255,255,255,0.65);font-size:calc(var(--fsize)*1.1);margin-bottom:8px;border-bottom:1px dashed rgba(255,255,255,0.2);padding-bottom:4px;}
+.lousa-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;}
+.lc-body{flex:1;}
+.lc-titulo{font-family:'Caveat',cursive;font-size:calc(var(--fsize)*1.2);color:white;font-weight:700;}
+.lc-hora{font-family:'Caveat',cursive;font-size:calc(var(--fsize)*0.88);color:rgba(255,255,255,0.65);}
+.lc-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.lc-chip{border-radius:8px;padding:2px 8px;font-size:10px;font-weight:800;color:white;}
+
+/* SAÚDE */
+.saude-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.saude-card{background:var(--branco);border-radius:18px;padding:14px;box-shadow:var(--sombra-sm);text-align:center;cursor:pointer;transition:transform 0.15s;}
+.saude-card:active{transform:scale(0.96);}
+.saude-card .sc-icon{font-size:28px;}
+.saude-card .sc-val{font-size:calc(var(--fsize)*1.3);font-weight:900;color:var(--texto);margin:2px 0;}
+.saude-card .sc-label{font-size:calc(var(--fsize)*0.72);color:var(--cinza);font-weight:700;}
+.saude-card .sc-status{font-size:calc(var(--fsize)*0.75);font-weight:800;margin-top:4px;}
+.sc-status.ok{color:var(--verde);} .sc-status.alert{color:var(--amber);} .sc-status.danger{color:var(--vermelho);}
+.copos-wrap{background:var(--branco);border-radius:18px;padding:14px;box-shadow:var(--sombra-sm);margin-bottom:10px;}
+.copos-titulo{font-size:calc(var(--fsize)*0.82);font-weight:800;color:var(--cinza);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.copos{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;}
+.copo{font-size:26px;cursor:pointer;transition:transform 0.15s;}
+.copo:hover{transform:scale(1.2);}
+.copo.vazio{filter:grayscale(1);opacity:.3;}
+.copos-info{text-align:center;font-size:calc(var(--fsize)*0.85);font-weight:800;color:var(--azul);margin-top:8px;}
+.dica-card{background:linear-gradient(135deg,#7b6bb5,#5a4a95);border-radius:18px;padding:14px 16px;color:white;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(123,107,181,0.3);}
+.dica-icon{font-size:28px;}
+.dica-txt{flex:1;font-size:calc(var(--fsize)*0.85);font-weight:600;line-height:1.4;}
+.btn-voz{background:rgba(255,255,255,0.2);border:none;border-radius:10px;padding:8px;color:white;font-size:18px;cursor:pointer;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.kpi-card{background:var(--branco);border-radius:18px;padding:14px;box-shadow:var(--sombra-sm);text-align:center;}
+.kpi-val{font-size:calc(var(--fsize)*1.6);font-weight:900;color:var(--texto);}
+.kpi-label{font-size:calc(var(--fsize)*0.72);color:var(--cinza);font-weight:700;margin-top:2px;}
+.kpi-trend{font-size:calc(var(--fsize)*0.75);font-weight:800;margin-top:4px;}
+.kpi-trend.up{color:var(--verde);} .kpi-trend.down{color:var(--vermelho);} .kpi-trend.neutral{color:var(--cinza);}
+.streak-card{background:linear-gradient(135deg,#f39c12,#e67e22);border-radius:18px;padding:16px;color:white;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px rgba(243,156,18,0.3);}
+.streak-num{font-size:42px;font-weight:900;line-height:1;}
+.streak-info .streak-titulo{font-size:calc(var(--fsize)*1.0);font-weight:900;}
+.streak-info .streak-sub{font-size:calc(var(--fsize)*0.78);opacity:.85;margin-top:2px;}
+.mini-grafico{background:var(--branco);border-radius:18px;padding:14px;box-shadow:var(--sombra-sm);margin-bottom:10px;}
+.mini-grafico-titulo{font-size:calc(var(--fsize)*0.78);font-weight:800;color:var(--cinza);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.barras{display:flex;gap:6px;align-items:flex-end;height:70px;}
+.barra-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.barra{width:100%;border-radius:6px 6px 0 0;transition:height 0.4s;}
+.barra-label{font-size:10px;font-weight:700;color:var(--cinza);}
+
+/* CHAT */
+.chat-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
+.chat-msgs::-webkit-scrollbar{width:3px;}
+.msg{max-width:82%;}
+.msg-bubble{padding:11px 14px;border-radius:18px;font-size:calc(var(--fsize)*0.9);font-weight:600;line-height:1.45;box-shadow:var(--sombra-sm);}
+.msg.ia .msg-bubble{background:var(--branco);color:var(--texto);border-bottom-left-radius:4px;}
+.msg.user{align-self:flex-end;}
+.msg.user .msg-bubble{background:var(--verde);color:white;border-bottom-right-radius:4px;}
+.ia-tag{font-size:10px;font-weight:800;color:var(--verde);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.chat-bar{display:flex;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);border-top:1px solid rgba(0,0,0,0.06);align-items:center;flex-shrink:0;}
+.chat-input{flex:1;border:none;border-radius:24px;padding:11px 16px;font-size:calc(var(--fsize)*0.9);font-family:'Nunito',sans-serif;background:var(--branco);color:var(--texto);outline:none;box-shadow:var(--sombra-sm);}
+.btn-circle{width:44px;height:44px;border-radius:50%;border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.1s;}
+.btn-circle:active{transform:scale(0.9);}
+.btn-mic{background:var(--verde);box-shadow:0 3px 10px rgba(90,171,143,0.4);}
+.btn-send{background:var(--azul);box-shadow:0 3px 10px rgba(107,154,191,0.4);}
+
+/* AJUSTES */
+.ajuste-card{background:var(--branco);border-radius:var(--radius);padding:16px;box-shadow:var(--sombra-sm);margin-bottom:10px;}
+.ajuste-titulo{font-size:calc(var(--fsize)*0.85);font-weight:800;color:var(--texto);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.toggle-row{display:flex;background:rgba(0,0,0,0.05);border-radius:12px;padding:4px;gap:4px;}
+.toggle-opt{flex:1;padding:9px 6px;border:none;border-radius:10px;font-size:calc(var(--fsize)*0.82);font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;background:transparent;color:var(--cinza);}
+.toggle-opt.ativo{background:var(--branco);color:var(--texto);box-shadow:var(--sombra-sm);}
+.familia-list{display:flex;flex-direction:column;gap:8px;}
+.fam-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.fam-row:last-child{border:none;}
+.fam-nome{font-size:calc(var(--fsize)*0.88);font-weight:800;color:var(--texto);}
+.fam-toggle{background:var(--verde-claro);color:var(--verde);border:none;border-radius:10px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+.fam-toggle.off{background:#f0f0f0;color:var(--cinza);}
+.aviso-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.aviso-row:last-child{border:none;}
+.aviso-nome{font-size:calc(var(--fsize)*0.85);font-weight:700;color:var(--texto);}
+.aviso-status{font-size:calc(var(--fsize)*0.8);font-weight:800;}
+.aviso-status.ok{color:var(--verde);} .aviso-status.config{color:var(--amber);}
+.perfil-field{margin-bottom:10px;}
+.perfil-field label{display:block;font-size:11px;font-weight:800;color:var(--cinza);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+.perfil-input{width:100%;padding:10px 14px;border:2px solid #e8eaed;border-radius:12px;font-size:calc(var(--fsize)*0.88);font-family:'Nunito',sans-serif;color:var(--texto);background:var(--fundo);outline:none;transition:border-color 0.2s;}
+.perfil-input:focus{border-color:var(--verde);}
+.btn-salvar-ajuste{background:var(--verde);color:white;border:none;border-radius:12px;padding:10px 20px;font-size:calc(var(--fsize)*0.85);font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px;}
+
+/* MODAIS */
+.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center;}
+.overlay.aberto{display:flex;}
+.modal{background:var(--branco);border-radius:24px 24px 0 0;padding:20px 18px 30px;width:100%;animation:slideUp 0.25s ease-out;max-height:85vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal h3{font-size:calc(var(--fsize)*1.05);font-weight:900;color:var(--texto);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.modal-field{margin-bottom:12px;}
+.modal-field label{display:block;font-size:calc(var(--fsize)*0.78);font-weight:800;color:var(--cinza);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px;}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;padding:11px 14px;border:2px solid #e8eaed;border-radius:12px;font-size:calc(var(--fsize)*0.9);font-family:'Nunito',sans-serif;color:var(--texto);background:var(--fundo);outline:none;transition:border-color 0.2s;}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--verde);}
+.modal-field textarea{resize:none;height:70px;}
+.modal-row{display:flex;gap:10px;}
+.modal-row .modal-field{flex:1;}
+.pessoas-check{display:flex;gap:8px;flex-wrap:wrap;}
+.pc-btn{padding:7px 12px;border-radius:10px;border:2px solid #e8eaed;font-size:calc(var(--fsize)*0.8);font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--texto-leve);background:var(--fundo);transition:all 0.15s;}
+.pc-btn.sel{border-color:var(--verde);background:var(--verde-claro);color:var(--verde);}
+.btn-salvar{width:100%;padding:14px;background:var(--verde);color:white;border:none;border-radius:14px;font-size:calc(var(--fsize)*1.0);font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px;}
+.btn-cancelar{width:100%;padding:10px;background:transparent;color:var(--cinza);border:none;font-size:calc(var(--fsize)*0.85);font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px;}
+
+/* MODAL SAÚDE */
+.saude-input-wrap{display:flex;gap:8px;align-items:center;}
+.saude-input-wrap input{flex:1;padding:14px;border:2px solid #e8eaed;border-radius:14px;font-size:calc(var(--fsize)*1.4);font-weight:900;text-align:center;font-family:'Nunito',sans-serif;color:var(--texto);background:var(--fundo);outline:none;}
+.saude-input-wrap input:focus{border-color:var(--verde);}
+.saude-input-sep{font-size:24px;font-weight:900;color:var(--cinza);}
+
+/* CTX MENU */
+.ctx-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.35);z-index:250;align-items:flex-end;justify-content:center;}
+.ctx-overlay.aberto{display:flex;}
+.ctx-menu{background:var(--branco);border-radius:24px 24px 0 0;padding:16px 18px 28px;width:100%;animation:slideUp 0.2s ease-out;}
+.ctx-titulo{font-size:calc(var(--fsize)*0.9);font-weight:900;color:var(--texto);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,0.07);display:flex;align-items:center;gap:8px;}
+.ctx-btn{width:100%;padding:14px 16px;border:none;border-radius:14px;font-size:calc(var(--fsize)*0.95);font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.ctx-btn.editar{background:var(--azul-claro);color:var(--azul);}
+.ctx-btn.adiar{background:var(--lilas-claro);color:var(--lilas);}
+.ctx-btn.excluir{background:var(--vermelho-claro);color:var(--vermelho);}
+.ctx-btn.excluir-hoje{background:var(--amber-claro);color:var(--amber);}
+.ctx-btn.cancelar-ctx{background:rgba(0,0,0,0.05);color:var(--cinza);}
+
+/* CONFIRM */
+.confirm-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:350;align-items:center;justify-content:center;padding:24px;}
+.confirm-overlay.aberto{display:flex;}
+.confirm-box{background:var(--branco);border-radius:22px;padding:24px 20px;width:100%;text-align:center;animation:fadeIn 0.18s ease-out;}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+.confirm-icon{font-size:40px;margin-bottom:10px;}
+.confirm-titulo{font-size:calc(var(--fsize)*1.05);font-weight:900;color:var(--texto);margin-bottom:6px;}
+.confirm-sub{font-size:calc(var(--fsize)*0.82);color:var(--cinza);font-weight:600;margin-bottom:20px;line-height:1.4;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-btns button{flex:1;padding:13px;border:none;border-radius:14px;font-size:calc(var(--fsize)*0.9);font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.btn-nao{background:rgba(0,0,0,0.07);color:var(--texto);}
+.btn-sim{background:#e05c4a;color:white;}
+
+/* BTN ADD */
+.btn-add{position:absolute;bottom:76px;right:16px;width:52px;height:52px;border-radius:50%;background:var(--verde);color:white;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(90,171,143,0.45);display:flex;align-items:center;justify-content:center;z-index:100;transition:transform 0.15s;}
+.btn-add:active{transform:scale(0.9);}
+
+/* ALARME */
+.alarme-overlay{display:none;position:absolute;inset:0;background:linear-gradient(135deg,#e05c4a,#c04030);z-index:300;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;animation:alarmePulse 1s infinite alternate;}
+.alarme-overlay.ativo{display:flex;}
+@keyframes alarmePulse{from{background:linear-gradient(135deg,#e05c4a,#c04030);}to{background:linear-gradient(135deg,#f06c5a,#d05040);}}
+.alarme-icon{font-size:72px;margin-bottom:16px;animation:shake 0.5s infinite;}
+@keyframes shake{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+.alarme-titulo{font-size:28px;font-weight:900;color:white;margin-bottom:8px;}
+.alarme-sub{font-size:18px;color:rgba(255,255,255,0.85);font-weight:700;margin-bottom:30px;}
+.btn-confirmar-alarme{background:white;color:#e05c4a;border:none;border-radius:20px;padding:16px 36px;font-size:20px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.alarme-familia{margin-top:20px;font-size:13px;color:rgba(255,255,255,0.7);font-weight:700;}
+
+/* TOAST */
+.toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#2e3a48;color:white;border-radius:14px;padding:10px 18px;font-size:13px;font-weight:700;white-space:nowrap;z-index:400;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* BOTTOM NAV */
+.bottom-nav{background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.07);display:flex;padding:8px 0 14px;flex-shrink:0;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:transform 0.1s;}
+.nav-item:active{transform:scale(0.88);}
+.nav-icon{font-size:20px;}
+.nav-label{font-size:9px;font-weight:800;color:var(--cinza);letter-spacing:.3px;}
+.nav-item.ativo .nav-label{color:var(--verde);}
+.nav-item.ativo .nav-icon{transform:scale(1.12);}
+
+@media(max-width:430px){
+  body{padding:0;background:#f7f4f1;}
+  .phone{width:100vw;height:100dvh;border-radius:0;box-shadow:none;}
+  .notch{border-radius:0;}
+}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="notch"></div>
+  <div class="statusbar"><span id="clock">09:42</span><span>📶 🔋 97%</span></div>
+
+  <div class="app-header">
+    <div class="header-left">
+      <h1>🌸 Agenda da Laudi</h1>
+      <div class="data" id="data-hoje"></div>
+    </div>
+    <button class="sos-btn" onclick="acionarSOS()">🆘<br>SOS</button>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="screen ativo" id="tela-agenda">
+    <div class="banner" id="banner-proximo">
+      <div class="banner-info">
+        <div class="banner-tag" id="banner-tag">⏰ Daqui 48 min</div>
+        <div class="banner-nome" id="banner-nome">💊 Captopril 25mg</div>
+        <div class="banner-hora" id="banner-hora">10:30 · Pressão</div>
+      </div>
+      <button class="btn-ok" onclick="confirmarBanner()">✔ OK</button>
+    </div>
+    <div class="filtro">
+      <button class="filtro-btn ativo" onclick="setFiltro(this,'todos')">👥 Todos</button>
+      <button class="filtro-btn" onclick="setFiltro(this,'laudi')">🌸 Laudi</button>
+      <button class="filtro-btn" onclick="setFiltro(this,'cido')">👨 Cido</button>
+    </div>
+    <div class="scroll-area" id="lista-agenda"></div>
+  </div>
+
+  <!-- LOUSA -->
+  <div class="screen" id="tela-lousa">
+    <div class="scroll-area"><div class="lousa-board" id="lousa-board"></div></div>
+  </div>
+
+  <!-- SAÚDE -->
+  <div class="screen" id="tela-saude">
+    <div class="scroll-area">
+      <div class="copos-wrap">
+        <div class="copos-titulo">💧 Hidratação — toque para marcar</div>
+        <div class="copos" id="copos"></div>
+        <div class="copos-info" id="copos-info">0 de 8 copos</div>
+      </div>
+      <div class="saude-grid" id="saude-grid"></div>
+      <div class="dica-card">
+        <div class="dica-icon">💡</div>
+        <div class="dica-txt" id="dica-txt">Beber água ao acordar ajuda a ativar o metabolismo e manter a pressão equilibrada.</div>
+        <button class="btn-voz" onclick="falarDica()">🔊</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="screen" id="tela-kpi">
+    <div class="scroll-area" id="kpi-area"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="screen" id="tela-chat" style="display:none;flex-direction:column;">
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="msg ia"><div class="ia-tag">🤖 Assistente IA</div><div class="msg-bubble">Olá, Laudi! 🌸 Posso ajudar com sua agenda, remédios ou qualquer dúvida. O que você precisa hoje?</div></div>
+    </div>
+    <div class="chat-bar">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Escreva aqui…" onkeydown="if(event.key==='Enter')enviarMsg()">
+      <button class="btn-circle btn-mic" onclick="mostrarToast('🎤 Microfone — em breve!')">🎤</button>
+      <button class="btn-circle btn-send" onclick="enviarMsg()">➤</button>
+    </div>
+  </div>
+
+  <!-- AJUSTES -->
+  <div class="screen" id="tela-ajustes">
+    <div class="scroll-area" id="ajustes-area"></div>
+  </div>
+
+  <!-- BTN + -->
+  <button class="btn-add" id="btn-add" onclick="abrirModal()">＋</button>
+
+  <!-- MODAL COMPROMISSO -->
+  <div class="overlay" id="overlay" onclick="fecharModalFora(event)">
+    <div class="modal" id="modal">
+      <h3 id="modal-titulo">＋ Novo compromisso <span style="font-size:22px;cursor:pointer;color:var(--cinza);" onclick="fecharModal()">✕</span></h3>
+      <div class="modal-field"><label>Tipo</label>
+        <select id="m-tipo">
+          <option value="remedios">💊 Remédio</option>
+          <option value="consulta">🏥 Consulta médica</option>
+          <option value="atividade">🚶 Atividade física</option>
+          <option value="refeicao">🍽️ Refeição</option>
+          <option value="familia">👨‍👩‍👧 Família</option>
+        </select></div>
+      <div class="modal-field"><label>Descrição</label><input type="text" id="m-desc" placeholder="Ex: Captopril 25mg"></div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Hora</label><input type="time" id="m-hora" value="08:00"></div>
+        <div class="modal-field"><label>Data</label><input type="date" id="m-data"></div>
+      </div>
+      <div class="modal-field"><label>Recorrência</label>
+        <select id="m-rec">
+          <option value="nao">Não repete</option>
+          <option value="diario">Todo dia</option>
+          <option value="semanal">Toda semana</option>
+          <option value="mensal">Todo mês</option>
+        </select></div>
+      <div class="modal-field"><label>Lembrete antecipado</label>
+        <select id="m-lembrete">
+          <option value="0">Na hora</option>
+          <option value="15">15 min antes</option>
+          <option value="30">30 min antes</option>
+          <option value="60">1 hora antes</option>
+          <option value="1440">1 dia antes</option>
+        </select></div>
+      <div class="modal-field"><label>Prioridade</label>
+        <select id="m-prio">
+          <option value="normal">Normal</option>
+          <option value="urgente">⚠️ Urgente</option>
+        </select></div>
+      <div class="modal-field"><label>Observação (opcional)</label><textarea id="m-obs" placeholder="Ex: Levar exames, consulta particular…"></textarea></div>
+      <div class="modal-field"><label>Para quem</label>
+        <div class="pessoas-check">
+          <button class="pc-btn sel" onclick="togglePessoa(this)" data-p="laudi">🌸 Laudi</button>
+          <button class="pc-btn" onclick="togglePessoa(this)" data-p="cido">👨 Cido</button>
+          <button class="pc-btn" onclick="togglePessoa(this)" data-p="cleber">👦 Cleber</button>
+          <button class="pc-btn" onclick="togglePessoa(this)" data-p="queli">👧 Queli</button>
+        </div></div>
+      <button class="btn-salvar" id="btn-salvar-modal" onclick="salvarCompromisso()">💾 Salvar</button>
+      <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL SAÚDE -->
+  <div class="overlay" id="overlay-saude" onclick="fecharModalSaudeFora(event)">
+    <div class="modal" id="modal-saude">
+      <h3 id="saude-modal-titulo">Registrar valor <span style="font-size:22px;cursor:pointer;color:var(--cinza);" onclick="fecharModalSaude()">✕</span></h3>
+      <div id="saude-modal-corpo"></div>
+      <button class="btn-salvar" onclick="salvarSaude()">💾 Salvar</button>
+      <button class="btn-cancelar" onclick="fecharModalSaude()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- CTX MENU -->
+  <div class="ctx-overlay" id="ctx-overlay" onclick="fecharCtxFora(event)">
+    <div class="ctx-menu">
+      <div class="ctx-titulo" id="ctx-titulo">📌 Compromisso</div>
+      <button class="ctx-btn editar" onclick="editarCtx()">✏️ Editar compromisso</button>
+      <button class="ctx-btn adiar" onclick="adiarCtx()">⏭️ Adiar 30 minutos</button>
+      <button class="ctx-btn excluir-hoje" id="ctx-btn-hoje" onclick="excluirHojeCtx()">🗓️ Excluir só hoje</button>
+      <button class="ctx-btn excluir" onclick="confirmarExcluirCtx()">🗑️ Excluir sempre</button>
+      <button class="ctx-btn cancelar-ctx" onclick="fecharCtx()">✕ Cancelar</button>
+    </div>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-titulo">Excluir compromisso?</div>
+      <div class="confirm-sub" id="confirm-sub">Esta ação não pode ser desfeita.</div>
+      <div class="confirm-btns">
+        <button class="btn-nao" onclick="fecharConfirm()">Não, voltar</button>
+        <button class="btn-sim" onclick="executarExclusao()">Sim, excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALARME -->
+  <div class="alarme-overlay" id="alarme">
+    <div class="alarme-icon" id="alarme-icon">💊</div>
+    <div class="alarme-titulo" id="alarme-titulo">Hora do Remédio!</div>
+    <div class="alarme-sub" id="alarme-sub">Captopril 25mg — 10:30</div>
+    <button class="btn-confirmar-alarme" onclick="fecharAlarme()">✅ Já tomei!</button>
+    <div class="alarme-familia">📲 Avisando Cido, Cleber e Queli…</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- BOTTOM NAV — 6 abas -->
+  <div class="bottom-nav">
+    <button class="nav-item ativo" onclick="mudarTela('agenda',this)"><span class="nav-icon">📅</span><span class="nav-label">Agenda</span></button>
+    <button class="nav-item" onclick="mudarTela('lousa',this)"><span class="nav-icon">📋</span><span class="nav-label">Lousa</span></button>
+    <button class="nav-item" onclick="mudarTela('saude',this)"><span class="nav-icon">💚</span><span class="nav-label">Saúde</span></button>
+    <button class="nav-item" onclick="mudarTela('kpi',this)"><span class="nav-icon">📊</span><span class="nav-label">Resumo</span></button>
+    <button class="nav-item" onclick="mudarTela('chat',this)"><span class="nav-icon">💬</span><span class="nav-label">Chat IA</span></button>
+    <button class="nav-item" onclick="mudarTela('ajustes',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Ajustes</span></button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// FAMÍLIA — preencha manualmente
+// ══════════════════════════════════════════
+// NÚMERO CIDO (esposo): substitua XXXXX pelo número e apikey do CallMeBot
+const CIDO   = { nome:"Cido",   fone:"XXXXX", apikey:"XXXXX" };
+// NÚMERO CLEBER (filho): substitua XXXXX pelo número e apikey do CallMeBot
+const CLEBER = { nome:"Cleber", fone:"XXXXX", apikey:"XXXXX" };
+// NÚMERO QUELI (filha): substitua XXXXX pelo número e apikey do CallMeBot
+const QUELI  = { nome:"Queli",  fone:"XXXXX", apikey:"XXXXX" };
+const FAMILIA = [CIDO, CLEBER, QUELI];
+
+// ══════════════════════════════════════════
+// GEMINI
+// ══════════════════════════════════════════
+const GEMINI_KEY = "AIzaSyCbDrCzX-5Uvo6MJiI3E2XN2xvK4g6ebck";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+let historicoChat = [];
+
+// ══════════════════════════════════════════
+// CONSTANTES VISUAIS
+// ══════════════════════════════════════════
+const ICONES = {remedios:'💊',consulta:'🏥',atividade:'🚶',refeicao:'🍽️',familia:'👨‍👩‍👧'};
+const CORES_LOUSA = {remedios:'#9b8ec4',consulta:'#6b9abf',atividade:'#5aab8f',refeicao:'#d4956a',familia:'#e8927c'};
+const BADGE_COR = {laudi:'pb-l',cido:'pb-ci',cleber:'pb-cl',queli:'pb-q'};
+const BADGE_EMOJI = {laudi:'🌸',cido:'👨',cleber:'👦',queli:'👧'};
+
+// ══════════════════════════════════════════
+// DADOS
+// ══════════════════════════════════════════
+let compromissos = JSON.parse(localStorage.getItem('laudi_comp') || 'null') || [
+  {id:1,tipo:'remedios',desc:'Captopril 25mg',hora:'10:30',data:'hoje',pessoas:['laudi'],recorrente:true,alarme:'hora',prio:'normal',obs:''},
+  {id:2,tipo:'consulta',desc:'Dr. Marcos — Cardiologista',hora:'14:00',data:'hoje',pessoas:['laudi','cido'],recorrente:false,alarme:'medico',prio:'normal',obs:'Levar exames de sangue'},
+  {id:3,tipo:'atividade',desc:'Caminhada leve no parque',hora:'08:00',data:'hoje',pessoas:['laudi'],recorrente:true,alarme:'hora',prio:'normal',obs:''},
+  {id:4,tipo:'refeicao',desc:'Almoço em família',hora:'12:00',data:'hoje',pessoas:['laudi','cido'],recorrente:false,alarme:null,prio:'normal',obs:''},
+  {id:5,tipo:'familia',desc:'Visita da Queli',hora:'15:00',data:'sab',pessoas:['laudi','queli'],recorrente:false,alarme:null,prio:'normal',obs:''},
+  {id:6,tipo:'remedios',desc:'Metformina 500mg',hora:'19:00',data:'hoje',pessoas:['laudi'],recorrente:true,alarme:'hora',prio:'normal',obs:''},
+  {id:7,tipo:'consulta',desc:'Dra. Carla — Endócrino',hora:'09:00',data:'05/06',pessoas:['laudi','cleber'],recorrente:false,alarme:'medico',prio:'normal',obs:''},
+];
+let feitos   = JSON.parse(localStorage.getItem('laudi_feitos')   || '[]');
+let adiados  = JSON.parse(localStorage.getItem('laudi_adiados')  || '{}');
+let saudeData = JSON.parse(localStorage.getItem('laudi_saude')   || 'null') || {
+  pressao:{val:'120/80',hist:['118/78','120/80','122/82','119/79','121/81','120/80','120/80']},
+  peso:{val:'62'},
+  sono:{val:'7:20'},
+  glicemia:{val:'95'},
+  atividades:{val:'1'}
+};
+let perfil = JSON.parse(localStorage.getItem('laudi_perfil') || 'null') || {
+  nome:'Laudi', nascimento:'', medico:'Dr. Marcos', medico_tel:''
+};
+let familiaConfig = JSON.parse(localStorage.getItem('laudi_familia') || 'null') || {
+  cido:{ativo:true}, cleber:{ativo:true}, queli:{ativo:true}
+};
+let metaCopos = parseInt(localStorage.getItem('laudi_meta_copos') || '8');
+let coposHoje = parseInt(localStorage.getItem('laudi_copos_hoje') || '2');
+let filtroAtual = 'todos';
+let ctxIdAtual  = null;
+let saudeModalKey = null;
+
+function salvarDados(){ localStorage.setItem('laudi_comp', JSON.stringify(compromissos)); }
+function salvarSaudeStorage(){ localStorage.setItem('laudi_saude', JSON.stringify(saudeData)); }
+
+// ══════════════════════════════════════════
+// RELÓGIO & DATA
+// ══════════════════════════════════════════
+function atualizarRelogio(){
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function atualizarData(){
+  const dias=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const n=new Date();
+  document.getElementById('data-hoje').textContent=`${dias[n.getDay()]}, ${n.getDate()} de ${meses[n.getMonth()]}`;
+}
+setInterval(atualizarRelogio,1000);
+setInterval(verificarStatus,30000);
+atualizarRelogio(); atualizarData();
+
+// ══════════════════════════════════════════
+// STATUS DOS CARDS
+// ══════════════════════════════════════════
+function getStatus(c){
+  if(feitos.includes(c.id)) return 'feito';
+  if(adiados[c.id])         return 'adiado';
+  if(c.data !== 'hoje')     return 'pendente';
+  const [hh,mm] = c.hora.split(':').map(Number);
+  const now = new Date();
+  const minComp = hh*60+mm;
+  const minNow  = now.getHours()*60+now.getMinutes();
+  if(minNow < minComp-5)  return 'pendente';
+  if(minNow <= minComp+15) return 'agora';
+  return 'atrasado';
+}
+const STATUS_LABEL = {
+  pendente:  {cls:'status-pendente', txt:'🕐 Pendente'},
+  agora:     {cls:'status-agora',    txt:'🔵 Agora'},
+  atrasado:  {cls:'status-atrasado', txt:'🔴 Atrasado'},
+  feito:     {cls:'status-feito',    txt:'✅ Feito'},
+  adiado:    {cls:'status-adiado',   txt:'⏭️ Adiado'},
+};
+function verificarStatus(){
+  compromissos.filter(c=>c.data==='hoje').forEach(c=>{
+    if(getStatus(c)==='atrasado' && !feitos.includes(c.id)){
+      // dispara alarme de atraso uma vez
+      const key = 'alarmou_'+c.id;
+      if(!sessionStorage.getItem(key)){
+        sessionStorage.setItem(key,'1');
+        dispararAlarme(ICONES[c.tipo]+' Compromisso Atrasado!', c.desc+' — era às '+c.hora);
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════
+// AGENDA
+// ══════════════════════════════════════════
+function renderAgenda(){
+  const lista = document.getElementById('lista-agenda');
+  const hoje = compromissos.filter(c=>c.data==='hoje');
+  const prox  = compromissos.filter(c=>c.data!=='hoje');
+  let html='';
+  const hf = hoje.filter(c=>filtroAtual==='todos'||c.pessoas.includes(filtroAtual));
+  if(hf.length){ html+='<div class="sec-title">🌅 Hoje</div>'; hf.forEach(c=>html+=renderCard(c)); }
+  const pf = prox.filter(c=>filtroAtual==='todos'||c.pessoas.includes(filtroAtual));
+  if(pf.length){ html+='<div class="sec-title">📅 Próximos</div>'; pf.forEach(c=>html+=renderCard(c)); }
+  if(!html) html='<div style="text-align:center;padding:40px 20px;color:var(--cinza);font-weight:700;">Nenhum compromisso 🌸</div>';
+  lista.innerHTML=html;
+  // atualizar banner
+  const prox1 = hoje.filter(c=>!feitos.includes(c.id)).sort((a,b)=>a.hora.localeCompare(b.hora))[0];
+  if(prox1){
+    document.getElementById('banner-tag').textContent='⏰ Próximo';
+    document.getElementById('banner-nome').textContent=ICONES[prox1.tipo]+' '+prox1.desc;
+    document.getElementById('banner-hora').textContent=prox1.hora;
+    document.getElementById('banner-proximo').style.display='flex';
+  } else {
+    document.getElementById('banner-proximo').style.display='none';
+  }
+}
+
+function renderCard(c){
+  const st = getStatus(c);
+  const sl = STATUS_LABEL[st];
+  const badges = c.pessoas.map(p=>`<span class="pessoa-badge ${BADGE_COR[p]||'pb-l'}">${BADGE_EMOJI[p]||'👤'}</span>`).join('');
+  const chips = [];
+  if(c.recorrente) chips.push(`<span class="chip recorrente">🔁 ${c.recorrente==='diario'||c.recorrente===true?'diário':c.recorrente}</span>`);
+  if(c.alarme==='medico'){ chips.push(`<span class="chip aviso-ant">📅 1 dia antes</span>`); chips.push(`<span class="chip aviso-dia">⏰ no dia</span>`); }
+  if(c.prio==='urgente') chips.push(`<span class="chip urgente">⚠️ urgente</span>`);
+  const btnLabel = st==='feito'?'✅ Feito': st==='adiado'?'⏭️ Adiado':'✔ Feito';
+  const btnClass = st==='feito'?'btn-acao feito-btn': st==='adiado'?'btn-acao adiar-btn':'btn-acao';
+  const obsHtml  = c.obs?`<div style="font-size:11px;color:var(--cinza);margin-top:3px;font-style:italic;">${c.obs}</div>`:'';
+  return `
+  <div class="card ${c.tipo} ${st==='atrasado'?'atrasado-card':''} ${st==='feito'?'feito':''}" id="card-${c.id}"
+    ontouchstart="iniciarPressao(${c.id},event)" ontouchend="cancelarPressao()" ontouchmove="cancelarPressao()"
+    onmousedown="iniciarPressao(${c.id},event)" onmouseup="cancelarPressao()" onmouseleave="cancelarPressao()">
+    <div class="card-icon">${ICONES[c.tipo]||'📌'}</div>
+    <div class="card-body">
+      <div class="card-titulo">${c.desc}</div>
+      <div class="card-meta">
+        <span class="card-hora">${c.hora}</span>
+        <span class="status-badge ${sl.cls}">${sl.txt}</span>
+        ${badges}${chips.join('')}
+      </div>
+      ${obsHtml}
+    </div>
+    <button class="${btnClass}" onclick="event.stopPropagation();marcarFeito(${c.id},this)">${btnLabel}</button>
+  </div>`;
+}
+
+function marcarFeito(id,btn){
+  if(feitos.includes(id)){ feitos=feitos.filter(f=>f!==id); }
+  else { feitos.push(id); mostrarToast('✅ Marcado como feito!'); }
+  localStorage.setItem('laudi_feitos',JSON.stringify(feitos));
+  delete adiados[id];
+  localStorage.setItem('laudi_adiados',JSON.stringify(adiados));
+  renderAgenda();
+}
+
+// ══════════════════════════════════════════
+// LOUSA
+// ══════════════════════════════════════════
+function renderLousa(){
+  const board = document.getElementById('lousa-board');
+  const secs = {hoje:{l:'📅 Hoje',i:[]},sab:{l:'📆 Esta semana',i:[]},outro:{l:'🔜 Próximos',i:[]}};
+  compromissos.forEach(c=>{ const k=c.data==='hoje'?'hoje':c.data==='sab'?'sab':'outro'; secs[k].i.push(c); });
+  let html='';
+  Object.values(secs).forEach(s=>{
+    if(!s.i.length) return;
+    html+=`<div class="lousa-col-title">${s.l}</div>`;
+    s.i.forEach(c=>{
+      const badges=c.pessoas.map(p=>`<span class="pessoa-badge ${BADGE_COR[p]||'pb-l'}" style="width:18px;height:18px;font-size:9px;">${BADGE_EMOJI[p]||'👤'}</span>`).join('');
+      const st=getStatus(c); const sl=STATUS_LABEL[st];
+      html+=`<div class="lousa-card"><div style="font-size:22px;">${ICONES[c.tipo]||'📌'}</div>
+      <div class="lc-body"><div class="lc-titulo">${c.desc}</div><div class="lc-hora">${c.hora} · ${c.data==='hoje'?'Hoje':c.data}</div>
+      <div class="lc-chips"><span class="lc-chip" style="background:${CORES_LOUSA[c.tipo]||'#888'}">${c.tipo}</span>
+      <span class="lc-chip" style="background:#555;">${sl.txt}</span><div style="display:flex;gap:3px;">${badges}</div></div></div></div>`;
+    });
+  });
+  board.innerHTML=html;
+}
+
+// ══════════════════════════════════════════
+// SAÚDE
+// ══════════════════════════════════════════
+const SAUDE_CFG = {
+  pressao: {icon:'❤️',label:'Pressão (mmHg)',unit:'mmHg',tipo:'pressao',
+    classBg: v=>{ const s=parseInt(v); return s>=140?'danger':s>=130?'alert':'ok'; },
+    statusTxt: v=>{ const s=parseInt(v); return s>=140?'🔴 Alta — avisa família':s>=130?'🟡 Atenção':'✅ Normal'; }},
+  peso:     {icon:'⚖️',label:'Peso',unit:'kg',tipo:'numero',
+    classBg:v=>'ok', statusTxt:v=>'✅ Registrado'},
+  sono:     {icon:'😴',label:'Sono (h:min)',unit:'h',tipo:'tempo',
+    classBg: v=>{ const h=parseFloat(v); return h<6?'danger':h<7?'alert':'ok'; },
+    statusTxt: v=>{ const h=parseFloat(v); return h<6?'🔴 Pouco sono':h<7?'🟡 Regular':'✅ Bom'; }},
+  glicemia: {icon:'🩸',label:'Glicemia (mg/dL)',unit:'mg/dL',tipo:'numero',
+    classBg: v=>{ const n=parseInt(v); return n>180?'danger':n>140?'alert':'ok'; },
+    statusTxt: v=>{ const n=parseInt(v); return n>180?'🔴 Alta':n>140?'🟡 Atenção':'✅ Normal'; }},
+  atividades:{icon:'🏃',label:'Atividades hoje',unit:'',tipo:'numero',
+    classBg: v=>parseInt(v)>=3?'ok':parseInt(v)>=2?'alert':'alert',
+    statusTxt: v=>parseInt(v)>=3?'✅ Meta atingida':'⚡ Meta: 3 por dia'},
+};
+
+function renderSaude(){
+  let html='';
+  Object.entries(SAUDE_CFG).forEach(([k,cfg])=>{
+    const val = saudeData[k]?.val||'--';
+    const cls = cfg.classBg(val);
+    const txt = cfg.statusTxt(val);
+    html+=`<div class="saude-card" onclick="abrirModalSaude('${k}')">
+      <div class="sc-icon">${cfg.icon}</div>
+      <div class="sc-val">${val}${cfg.unit&&cfg.tipo==='numero'?' '+cfg.unit:''}</div>
+      <div class="sc-label">${cfg.label}</div>
+      <div class="sc-status ${cls}">${txt}</div>
+      <div style="font-size:10px;color:var(--cinza);margin-top:3px;font-weight:700;">Toque para editar</div>
+    </div>`;
+  });
+  document.getElementById('saude-grid').innerHTML=html;
+}
+
+function abrirModalSaude(key){
+  saudeModalKey=key;
+  const cfg=SAUDE_CFG[key];
+  const val=saudeData[key]?.val||'';
+  document.getElementById('saude-modal-titulo').innerHTML=`${cfg.icon} ${cfg.label} <span style="font-size:22px;cursor:pointer;color:var(--cinza);" onclick="fecharModalSaude()">✕</span>`;
+  let corpo='';
+  if(key==='pressao'){
+    const parts=val.split('/');
+    corpo=`<div class="modal-field"><label>Sistólica / Diastólica</label>
+    <div class="saude-input-wrap">
+      <input type="number" id="si-sis" value="${parts[0]||''}" placeholder="120" min="60" max="250">
+      <span class="saude-input-sep">/</span>
+      <input type="number" id="si-dia" value="${parts[1]||''}" placeholder="80" min="40" max="150">
+    </div>
+    <div style="font-size:12px;color:var(--cinza);margin-top:6px;font-weight:700;">Normal: abaixo de 130/85 · Atenção: 130-139 · Alta: 140+</div></div>`;
+  } else if(key==='sono'){
+    corpo=`<div class="modal-field"><label>Horas dormidas</label>
+    <div class="saude-input-wrap"><input type="text" id="si-val" value="${val}" placeholder="7:30" style="font-size:2rem;font-weight:900;text-align:center;"></div>
+    <div style="font-size:12px;color:var(--cinza);margin-top:6px;font-weight:700;">Digite no formato h:mm (ex: 7:30)</div></div>`;
+  } else {
+    corpo=`<div class="modal-field"><label>${cfg.label}</label>
+    <div class="saude-input-wrap"><input type="number" id="si-val" value="${val}" placeholder="0" style="font-size:2rem;font-weight:900;text-align:center;"></div></div>`;
+  }
+  // histórico pressão
+  if(key==='pressao' && saudeData.pressao.hist){
+    corpo+=`<div style="margin-top:12px;"><div class="mini-grafico-titulo">📈 Últimos 7 dias</div>
+    <div class="barras">${saudeData.pressao.hist.map((v,i)=>{
+      const dias=['D-6','D-5','D-4','D-3','D-2','D-1','Hoje'];
+      const s=parseInt(v); const h=Math.round((s/180)*60);
+      const cor=s>=140?'#e05c4a':s>=130?'#d4956a':'#5aab8f';
+      return `<div class="barra-wrap"><div class="barra" style="height:${h}px;background:${cor};"></div><div class="barra-label">${dias[i]}</div></div>`;
+    }).join('')}</div></div>`;
+  }
+  document.getElementById('saude-modal-corpo').innerHTML=corpo;
+  document.getElementById('overlay-saude').classList.add('aberto');
+}
+
+function salvarSaude(){
+  const key=saudeModalKey;
+  if(!key) return;
+  let val='';
+  if(key==='pressao'){
+    const s=document.getElementById('si-sis')?.value;
+    const d=document.getElementById('si-dia')?.value;
+    if(!s||!d){ mostrarToast('⚠️ Preencha os dois valores'); return; }
+    val=s+'/'+d;
+    // atualiza histórico
+    if(!saudeData.pressao.hist) saudeData.pressao.hist=[];
+    saudeData.pressao.hist.push(val);
+    if(saudeData.pressao.hist.length>7) saudeData.pressao.hist.shift();
+    // alerta família se alta
+    if(parseInt(s)>=140){ mostrarToast('⚠️ Pressão alta! Avisando família…'); }
+  } else {
+    val=document.getElementById('si-val')?.value||'';
+    if(!val){ mostrarToast('⚠️ Digite um valor'); return; }
+  }
+  if(!saudeData[key]) saudeData[key]={};
+  saudeData[key].val=val;
+  salvarSaudeStorage();
+  fecharModalSaude();
+  renderSaude();
+  mostrarToast('✅ Saúde atualizada!');
+}
+function fecharModalSaude(){ document.getElementById('overlay-saude').classList.remove('aberto'); }
+function fecharModalSaudeFora(e){ if(e.target.id==='overlay-saude') fecharModalSaude(); }
+
+// ══════════════════════════════════════════
+// COPOS
+// ══════════════════════════════════════════
+function renderCopos(){
+  const wrap=document.getElementById('copos');
+  wrap.innerHTML='';
+  for(let i=0;i<metaCopos;i++){
+    const sp=document.createElement('span');
+    sp.className='copo'+(i>=coposHoje?' vazio':'');
+    sp.textContent='🥤';
+    sp.onclick=()=>{ sp.classList.toggle('vazio'); atualizarCopos(); };
+    wrap.appendChild(sp);
+  }
+  atualizarCopos();
+}
+function atualizarCopos(){
+  const total=document.querySelectorAll('#copos .copo:not(.vazio)').length;
+  coposHoje=total;
+  localStorage.setItem('laudi_copos_hoje',total);
+  document.getElementById('copos-info').textContent=`${total} de ${metaCopos} copos 💧`;
+}
+
+// ══════════════════════════════════════════
+// KPI
+// ══════════════════════════════════════════
+function renderKPI(){
+  const total = compromissos.filter(c=>c.data==='hoje').length||1;
+  const feitosHoje = compromissos.filter(c=>c.data==='hoje'&&feitos.includes(c.id)).length;
+  const pct = Math.round((feitosHoje/total)*100);
+  const remediosTot = compromissos.filter(c=>c.data==='hoje'&&c.tipo==='remedios').length||1;
+  const remediosFei = compromissos.filter(c=>c.data==='hoje'&&c.tipo==='remedios'&&feitos.includes(c.id)).length;
+  const pctRem = Math.round((remediosFei/remediosTot)*100);
+  const pressaoOk = saudeData.pressao?.hist?.filter(v=>parseInt(v)<130).length||0;
+  const streak = feitos.length>=3?feitos.length:0;
+
+  document.getElementById('kpi-area').innerHTML=`
+  <div class="sec-title">📊 Resumo do dia</div>
+  <div class="streak-card">
+    <div class="streak-num">🏆${streak}</div>
+    <div class="streak-info">
+      <div class="streak-titulo">Sequência de tarefas feitas!</div>
+      <div class="streak-sub">Continue assim, Laudi! 🌸</div>
+    </div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-val">${pct}%</div>
+      <div class="kpi-label">Compromissos feitos hoje</div>
+      <div class="kpi-trend ${pct>=80?'up':pct>=50?'neutral':'down'}">${pct>=80?'✅ Ótimo!':pct>=50?'⚡ Quase lá':'⚠️ Atenção'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">${pctRem}%</div>
+      <div class="kpi-label">Remédios tomados</div>
+      <div class="kpi-trend ${pctRem===100?'up':pctRem>=50?'neutral':'down'}">${pctRem===100?'✅ Perfeito!':'⚠️ Pendentes'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">${coposHoje}/${metaCopos}</div>
+      <div class="kpi-label">Copos de água</div>
+      <div class="kpi-trend ${coposHoje>=metaCopos?'up':coposHoje>=metaCopos/2?'neutral':'down'}">${coposHoje>=metaCopos?'✅ Meta!':'💧 Continue'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">${saudeData.pressao?.val||'--'}</div>
+      <div class="kpi-label">Pressão hoje</div>
+      <div class="kpi-trend ${parseInt(saudeData.pressao?.val)<130?'up':'down'}">${parseInt(saudeData.pressao?.val)<130?'✅ Normal':'⚠️ Atenção'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">${saudeData.atividades?.val||'0'}</div>
+      <div class="kpi-label">Atividades físicas</div>
+      <div class="kpi-trend ${parseInt(saudeData.atividades?.val)>=3?'up':'neutral'}">${parseInt(saudeData.atividades?.val)>=3?'✅ Meta!':'⚡ Meta: 3'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">${saudeData.sono?.val||'--'}</div>
+      <div class="kpi-label">Sono ontem</div>
+      <div class="kpi-trend ${parseFloat(saudeData.sono?.val)>=7?'up':parseFloat(saudeData.sono?.val)>=6?'neutral':'down'}">${parseFloat(saudeData.sono?.val)>=7?'✅ Bom':'⚠️ Pouco'}</div>
+    </div>
+  </div>
+  <div class="mini-grafico">
+    <div class="mini-grafico-titulo">❤️ Pressão sistólica — 7 dias</div>
+    <div class="barras">${(saudeData.pressao?.hist||[]).map((v,i)=>{
+      const dias=['D-6','D-5','D-4','D-3','D-2','D-1','Hoje'];
+      const s=parseInt(v)||120; const h=Math.round((s/180)*60);
+      const cor=s>=140?'#e05c4a':s>=130?'#d4956a':'#5aab8f';
+      return `<div class="barra-wrap"><div class="barra" style="height:${h}px;background:${cor};"></div><div class="barra-label">${dias[i]||i}</div></div>`;
+    }).join('')}</div>
+  </div>
+  <div class="sec-title">👨‍👩‍👧 Visão da família</div>
+  <div class="ajuste-card" style="margin-bottom:10px;">
+    <div style="font-size:calc(var(--fsize)*0.85);font-weight:700;color:var(--texto-leve);line-height:1.6;">
+      💊 Remédios: <b>${remediosFei}/${remediosTot} tomados</b><br>
+      ❤️ Pressão: <b>${saudeData.pressao?.val||'não registrada'}</b><br>
+      💧 Água: <b>${coposHoje} copos</b><br>
+      📅 Próxima consulta: <b>${compromissos.find(c=>c.tipo==='consulta'&&!feitos.includes(c.id))?.desc||'Nenhuma agendada'}</b>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// AJUSTES
+// ══════════════════════════════════════════
+function renderAjustes(){
+  document.getElementById('ajustes-area').innerHTML=`
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">🎨 Tema visual</div>
+    <div class="toggle-row">
+      <button class="toggle-opt ativo" onclick="setTema('claro',this)">☀️ Claro</button>
+      <button class="toggle-opt" onclick="setTema('lousa',this)">🖊️ Lousa</button>
+    </div>
+  </div>
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">🔤 Tamanho da letra</div>
+    <div class="toggle-row">
+      <button class="toggle-opt ativo" onclick="setFonte('normal',this)">A Grande</button>
+      <button class="toggle-opt" onclick="setFonte('maior',this)">A+ Maior</button>
+    </div>
+  </div>
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">🌸 Perfil da Laudi</div>
+    <div class="perfil-field"><label>Nome</label><input class="perfil-input" id="pf-nome" value="${perfil.nome}" placeholder="Nome completo"></div>
+    <div class="perfil-field"><label>Data de nascimento</label><input class="perfil-input" id="pf-nasc" type="date" value="${perfil.nascimento}"></div>
+    <div class="perfil-field"><label>Médico de referência</label><input class="perfil-input" id="pf-med" value="${perfil.medico}" placeholder="Dr. Nome"></div>
+    <div class="perfil-field"><label>Telefone do médico</label><input class="perfil-input" id="pf-tel" value="${perfil.medico_tel}" placeholder="(xx) xxxxx-xxxx"></div>
+    <button class="btn-salvar-ajuste" onclick="salvarPerfil()">💾 Salvar perfil</button>
+  </div>
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">👨‍👩‍👧 Família — avisos</div>
+    <div class="familia-list">
+      <div class="fam-row"><span class="fam-nome">💑 Cido (esposo)</span><button class="fam-toggle ${familiaConfig.cido.ativo?'':'off'}" onclick="toggleFamilia('cido',this)">${familiaConfig.cido.ativo?'✅ Ativo':'❌ Off'}</button></div>
+      <div class="fam-row"><span class="fam-nome">👦 Cleber (filho)</span><button class="fam-toggle ${familiaConfig.cleber.ativo?'':'off'}" onclick="toggleFamilia('cleber',this)">${familiaConfig.cleber.ativo?'✅ Ativo':'❌ Off'}</button></div>
+      <div class="fam-row"><span class="fam-nome">👧 Queli (filha)</span><button class="fam-toggle ${familiaConfig.queli.ativo?'':'off'}" onclick="toggleFamilia('queli',this)">${familiaConfig.queli.ativo?'✅ Ativo':'❌ Off'}</button></div>
+    </div>
+  </div>
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">💧 Meta de água diária</div>
+    <div class="toggle-row">
+      ${[6,7,8,10].map(n=>`<button class="toggle-opt ${metaCopos===n?'ativo':''}" onclick="setMetaCopos(${n},this)">${n} copos</button>`).join('')}
+    </div>
+  </div>
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">🔔 Canais de aviso</div>
+    <div class="aviso-row"><span class="aviso-nome">📱 Alarme no celular</span><span class="aviso-status ok">✅ Ativo</span></div>
+    <div class="aviso-row"><span class="aviso-nome">💬 WhatsApp — Cido</span><span class="aviso-status config">⚙️ Config. manual</span></div>
+    <div class="aviso-row"><span class="aviso-nome">💬 WhatsApp — Cleber</span><span class="aviso-status config">⚙️ Config. manual</span></div>
+    <div class="aviso-row" style="border:none;"><span class="aviso-nome">💬 WhatsApp — Queli</span><span class="aviso-status config">⚙️ Config. manual</span></div>
+  </div>
+  <div class="ajuste-card">
+    <div class="ajuste-titulo">⏰ Regras de alarme</div>
+    <div class="aviso-row"><span class="aviso-nome">💊 Remédio</span><span class="aviso-status ok">Na hora</span></div>
+    <div class="aviso-row" style="border:none;"><span class="aviso-nome">🏥 Consulta médica</span><span class="aviso-status ok">1 dia antes + no dia</span></div>
+  </div>
+  <div style="height:20px;"></div>`;
+}
+
+function salvarPerfil(){
+  perfil.nome = document.getElementById('pf-nome').value;
+  perfil.nascimento = document.getElementById('pf-nasc').value;
+  perfil.medico = document.getElementById('pf-med').value;
+  perfil.medico_tel = document.getElementById('pf-tel').value;
+  localStorage.setItem('laudi_perfil',JSON.stringify(perfil));
+  mostrarToast('✅ Perfil salvo!');
+}
+function toggleFamilia(key,btn){
+  familiaConfig[key].ativo = !familiaConfig[key].ativo;
+  btn.className='fam-toggle'+(familiaConfig[key].ativo?'':' off');
+  btn.textContent=familiaConfig[key].ativo?'✅ Ativo':'❌ Off';
+  localStorage.setItem('laudi_familia',JSON.stringify(familiaConfig));
+}
+function setMetaCopos(n,btn){
+  metaCopos=n;
+  localStorage.setItem('laudi_meta_copos',n);
+  btn.closest('.toggle-row').querySelectorAll('.toggle-opt').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  renderCopos();
+  mostrarToast(`✅ Meta: ${n} copos/dia`);
+}
+
+// ══════════════════════════════════════════
+// NAVEGAÇÃO
+// ══════════════════════════════════════════
+function mudarTela(nome,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('ativo'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
+  const t=document.getElementById('tela-'+nome);
+  t.classList.add('ativo'); t.style.display='flex';
+  btn.classList.add('ativo');
+  document.getElementById('btn-add').style.display=['agenda','lousa'].includes(nome)?'flex':'none';
+  if(nome==='lousa')   renderLousa();
+  if(nome==='agenda')  renderAgenda();
+  if(nome==='saude')   renderSaude();
+  if(nome==='kpi')     renderKPI();
+  if(nome==='ajustes') renderAjustes();
+}
+function setFiltro(btn,f){
+  document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo'); filtroAtual=f; renderAgenda();
+}
+function setTema(t,btn){
+  btn.closest('.toggle-row').querySelectorAll('.toggle-opt').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  document.getElementById('phone').classList.toggle('lousa-tema',t==='lousa');
+}
+function setFonte(t,btn){
+  btn.closest('.toggle-row').querySelectorAll('.toggle-opt').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  document.getElementById('phone').classList.toggle('fonte-maior',t==='maior');
+}
+
+// ══════════════════════════════════════════
+// MODAL COMPROMISSO
+// ══════════════════════════════════════════
+function abrirModal(){
+  const hoje=new Date().toISOString().split('T')[0];
+  document.getElementById('m-data').value=hoje;
+  document.getElementById('m-desc').value='';
+  document.getElementById('m-obs').value='';
+  document.getElementById('m-tipo').value='remedios';
+  document.getElementById('m-rec').value='nao';
+  document.getElementById('m-lembrete').value='0';
+  document.getElementById('m-prio').value='normal';
+  document.querySelectorAll('.pc-btn').forEach(b=>b.classList.toggle('sel',b.dataset.p==='laudi'));
+  document.getElementById('modal-titulo').innerHTML='＋ Novo compromisso <span style="font-size:22px;cursor:pointer;color:var(--cinza);" onclick="fecharModal()">✕</span>';
+  document.getElementById('btn-salvar-modal').textContent='💾 Salvar';
+  document.getElementById('btn-salvar-modal').onclick=salvarCompromisso;
+  document.getElementById('overlay').classList.add('aberto');
+}
+function fecharModal(){
+  document.getElementById('overlay').classList.remove('aberto');
+}
+function fecharModalFora(e){ if(e.target.id==='overlay') fecharModal(); }
+function togglePessoa(btn){ btn.classList.toggle('sel'); }
+
+function salvarCompromisso(){
+  const tipo=document.getElementById('m-tipo').value;
+  const desc=document.getElementById('m-desc').value.trim();
+  const hora=document.getElementById('m-hora').value;
+  const data=document.getElementById('m-data').value;
+  const rec =document.getElementById('m-rec').value;
+  const prio=document.getElementById('m-prio').value;
+  const obs =document.getElementById('m-obs').value.trim();
+  const hoje=new Date().toISOString().split('T')[0];
+  const pessoas=[...document.querySelectorAll('.pc-btn.sel')].map(b=>b.dataset.p);
+  if(!desc){ mostrarToast('⚠️ Escreva uma descrição'); return; }
+  if(!pessoas.length){ mostrarToast('⚠️ Selecione pelo menos uma pessoa'); return; }
+  compromissos.push({
+    id:Date.now(),tipo,desc,hora,
+    data:data===hoje?'hoje':data,
+    pessoas,recorrente:rec!=='nao'?rec:false,
+    alarme:tipo==='consulta'?'medico':tipo==='remedios'?'hora':null,
+    prio,obs
+  });
+  salvarDados(); fecharModal(); renderAgenda();
+  mostrarToast('✅ Compromisso salvo!');
+}
+
+// ══════════════════════════════════════════
+// PRESSÃO LONGA — MENU CONTEXTO
+// ══════════════════════════════════════════
+let pressTimer=null;
+function iniciarPressao(id,e){
+  cancelarPressao();
+  pressTimer=setTimeout(()=>{ if('vibrate' in navigator) navigator.vibrate(40); abrirCtx(id); },600);
+}
+function cancelarPressao(){ clearTimeout(pressTimer); pressTimer=null; }
+
+function abrirCtx(id){
+  ctxIdAtual=id;
+  const c=compromissos.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('ctx-titulo').innerHTML=`${ICONES[c.tipo]} ${c.desc}`;
+  document.getElementById('ctx-btn-hoje').style.display=c.recorrente?'flex':'none';
+  document.getElementById('ctx-overlay').classList.add('aberto');
+}
+function fecharCtx(){ document.getElementById('ctx-overlay').classList.remove('aberto'); ctxIdAtual=null; }
+function fecharCtxFora(e){ if(e.target.id==='ctx-overlay') fecharCtx(); }
+
+function editarCtx(){
+  const c=compromissos.find(x=>x.id===ctxIdAtual);
+  if(!c) return;
+  fecharCtx();
+  const hoje=new Date().toISOString().split('T')[0];
+  document.getElementById('m-tipo').value=c.tipo;
+  document.getElementById('m-desc').value=c.desc;
+  document.getElementById('m-hora').value=c.hora;
+  document.getElementById('m-data').value=c.data==='hoje'?hoje:c.data;
+  document.getElementById('m-rec').value=c.recorrente&&c.recorrente!==false?c.recorrente:'nao';
+  document.getElementById('m-prio').value=c.prio||'normal';
+  document.getElementById('m-obs').value=c.obs||'';
+  document.querySelectorAll('.pc-btn').forEach(b=>b.classList.toggle('sel',c.pessoas.includes(b.dataset.p)));
+  document.getElementById('modal-titulo').innerHTML='✏️ Editar <span style="font-size:22px;cursor:pointer;color:var(--cinza);" onclick="fecharModal()">✕</span>';
+  const id=ctxIdAtual;
+  document.getElementById('btn-salvar-modal').textContent='💾 Atualizar';
+  document.getElementById('btn-salvar-modal').onclick=()=>atualizarCompromisso(id);
+  document.getElementById('overlay').classList.add('aberto');
+}
+function atualizarCompromisso(id){
+  const tipo=document.getElementById('m-tipo').value;
+  const desc=document.getElementById('m-desc').value.trim();
+  const hora=document.getElementById('m-hora').value;
+  const data=document.getElementById('m-data').value;
+  const rec =document.getElementById('m-rec').value;
+  const prio=document.getElementById('m-prio').value;
+  const obs =document.getElementById('m-obs').value.trim();
+  const hoje=new Date().toISOString().split('T')[0];
+  const pessoas=[...document.querySelectorAll('.pc-btn.sel')].map(b=>b.dataset.p);
+  if(!desc){ mostrarToast('⚠️ Escreva uma descrição'); return; }
+  const idx=compromissos.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  compromissos[idx]={...compromissos[idx],tipo,desc,hora,data:data===hoje?'hoje':data,pessoas,recorrente:rec!=='nao'?rec:false,prio,obs};
+  salvarDados(); fecharModal(); renderAgenda();
+  mostrarToast('✅ Compromisso atualizado!');
+}
+
+function adiarCtx(){
+  const c=compromissos.find(x=>x.id===ctxIdAtual);
+  if(!c) return;
+  fecharCtx();
+  const [hh,mm]=c.hora.split(':').map(Number);
+  const novaHora=new Date(0,0,0,hh,mm+30);
+  const novaStr=`${String(novaHora.getHours()).padStart(2,'0')}:${String(novaHora.getMinutes()).padStart(2,'0')}`;
+  const idx=compromissos.findIndex(x=>x.id===ctxIdAtual);
+  compromissos[idx].hora=novaStr;
+  adiados[ctxIdAtual]='30min';
+  localStorage.setItem('laudi_adiados',JSON.stringify(adiados));
+  salvarDados(); renderAgenda();
+  mostrarToast(`⏭️ Adiado para ${novaStr}`);
+}
+
+function excluirHojeCtx(){
+  fecharCtx();
+  const c=compromissos.find(x=>x.id===ctxIdAtual);
+  document.getElementById('confirm-sub').textContent=`"${c?.desc}" será removido apenas hoje.`;
+  document.getElementById('confirm-overlay').dataset.modo='hoje';
+  document.getElementById('confirm-overlay').classList.add('aberto');
+}
+function confirmarExcluirCtx(){
+  fecharCtx();
+  const c=compromissos.find(x=>x.id===ctxIdAtual);
+  document.getElementById('confirm-sub').textContent=`"${c?.desc}" será excluído para sempre.`;
+  document.getElementById('confirm-overlay').dataset.modo='sempre';
+  document.getElementById('confirm-overlay').classList.add('aberto');
+}
+function fecharConfirm(){ document.getElementById('confirm-overlay').classList.remove('aberto'); }
+function executarExclusao(){
+  const modo=document.getElementById('confirm-overlay').dataset.modo;
+  fecharConfirm();
+  if(!ctxIdAtual) return;
+  if(modo==='hoje'){
+    if(!feitos.includes(ctxIdAtual)) feitos.push(ctxIdAtual);
+    localStorage.setItem('laudi_feitos',JSON.stringify(feitos));
+    mostrarToast('🗓️ Removido só hoje!');
+  } else {
+    compromissos=compromissos.filter(x=>x.id!==ctxIdAtual);
+    feitos=feitos.filter(f=>f!==ctxIdAtual);
+    salvarDados();
+    localStorage.setItem('laudi_feitos',JSON.stringify(feitos));
+    mostrarToast('🗑️ Compromisso excluído!');
+  }
+  ctxIdAtual=null;
+  renderAgenda(); renderLousa();
+}
+
+// ══════════════════════════════════════════
+// ALARME
+// ══════════════════════════════════════════
+function dispararAlarme(titulo,sub,icon='💊'){
+  document.getElementById('alarme-icon').textContent=icon;
+  document.getElementById('alarme-titulo').textContent=titulo;
+  document.getElementById('alarme-sub').textContent=sub;
+  document.getElementById('alarme').classList.add('ativo');
+  if('vibrate' in navigator) navigator.vibrate([500,200,500,200,500]);
+}
+function fecharAlarme(){ document.getElementById('alarme').classList.remove('ativo'); mostrarToast('✅ Confirmado!'); }
+function acionarSOS(){ dispararAlarme('🆘 SOS ACIONADO','Ligando SAMU 192 + avisando família…','🆘'); }
+function confirmarBanner(){ document.getElementById('banner-proximo').style.opacity='0'; setTimeout(()=>document.getElementById('banner-proximo').style.display='none',400); mostrarToast('✅ Confirmado!'); }
+
+// ══════════════════════════════════════════
+// CHAT — GEMINI REAL
+// ══════════════════════════════════════════
+function contextoAgenda(){
+  const hoje=compromissos.filter(c=>c.data==='hoje');
+  const feitosHoje=hoje.filter(c=>feitos.includes(c.id)).map(c=>c.desc);
+  const pendentes=hoje.filter(c=>!feitos.includes(c.id)).map(c=>`${c.hora} — ${c.desc}`);
+  const prox=compromissos.filter(c=>c.data!=='hoje').map(c=>`${c.data} ${c.hora} — ${c.desc}`);
+  return `Você é a assistente pessoal da ${perfil.nome||'Laudi'}, uma mulher de 60 anos. Seja carinhosa, clara e objetiva. Frases curtas. Responda sempre em português brasileiro.
+DATA/HORA: ${new Date().toLocaleString('pt-BR')}
+FAMÍLIA: Cido (esposo), Cleber (filho), Queli (filha)
+PENDENTES HOJE: ${pendentes.join('; ')||'Nenhum'}
+JÁ FEITOS: ${feitosHoje.join(', ')||'Nenhum'}
+PRÓXIMOS: ${prox.join('; ')||'Nenhum'}
+SAÚDE: Pressão ${saudeData.pressao?.val||'não registrada'}, Peso ${saudeData.peso?.val||'--'}kg, Sono ${saudeData.sono?.val||'--'}h
+Responda sobre agenda, remédios, saúde e família. Seja gentil e encorajadora.`.trim();
+}
+
+function addMsgChat(tipo,texto){
+  const msgs=document.getElementById('chat-msgs');
+  if(tipo==='ia') msgs.innerHTML+=`<div class="msg ia"><div class="ia-tag">🤖 Assistente IA</div><div class="msg-bubble">${texto}</div></div>`;
+  else if(tipo==='user') msgs.innerHTML+=`<div class="msg user"><div class="msg-bubble">${texto}</div></div>`;
+  else if(tipo==='digitando') msgs.innerHTML+=`<div class="msg ia" id="digitando"><div class="ia-tag">🤖 Assistente IA</div><div class="msg-bubble" style="color:var(--cinza);">digitando…</div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+async function enviarMsg(){
+  const inp=document.getElementById('chat-input');
+  const txt=inp.value.trim();
+  if(!txt) return;
+  addMsgChat('user',txt);
+  inp.value=''; inp.disabled=true;
+  historicoChat.push({role:'user',parts:[{text:txt}]});
+  addMsgChat('digitando');
+  try {
+    const res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system_instruction:{parts:[{text:contextoAgenda()}]},contents:historicoChat,generationConfig:{maxOutputTokens:300,temperature:0.7}})});
+    const data=await res.json();
+    document.getElementById('digitando')?.remove();
+    if(data.candidates?.[0]?.content?.parts?.[0]?.text){
+      const r=data.candidates[0].content.parts[0].text;
+      historicoChat.push({role:'model',parts:[{text:r}]});
+      addMsgChat('ia',r);
+    } else { addMsgChat('ia','Não consegui responder agora. Tente novamente! 🌸'); }
+  } catch(e){ document.getElementById('digitando')?.remove(); addMsgChat('ia','Sem conexão. Verifique a internet. 🌸'); }
+  inp.disabled=false; inp.focus();
+}
+
+// ══════════════════════════════════════════
+// DICA / TOAST
+// ══════════════════════════════════════════
+function falarDica(){
+  const txt=document.getElementById('dica-txt').textContent;
+  if('speechSynthesis' in window){ const u=new SpeechSynthesisUtterance(txt); u.lang='pt-BR'; speechSynthesis.speak(u); }
+  else mostrarToast('🔊 '+txt.substring(0,60)+'…');
+}
+let toastTimer;
+function mostrarToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderAgenda();
+renderCopos();
+verificarStatus();
+</script>
+</body>
+</html>
